@@ -11,3 +11,6 @@ lint:
 	@golangci-lint version
 	@golangci-lint config verify
 	@golangci-lint run
+
+run:
+	@go run example/main.go
