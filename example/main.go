@@ -9,7 +9,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/vmkteam/zenrpc/v2"
 )
 
 const appName = "apisrv"
@@ -27,7 +26,6 @@ func main() {
 	e.Any("/debug/pprof/*", appkit.PprofHandler)
 	e.GET("/debug/metadata", md.Handler)
 	e.GET("/metrics", echo.WrapHandler(promhttp.Handler()))
-	e.GET("/v1/rpc/doc/", appkit.EchoHandlerFunc(zenrpc.SMDBoxHandler))
 	e.GET("/", appkit.RenderRoutes(appName, e))
 
 	// register metadata as metrics
