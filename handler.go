@@ -8,7 +8,7 @@ import (
 
 	"github.com/getsentry/sentry-go"
 	sentryecho "github.com/getsentry/sentry-go/echo"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 var (
@@ -55,7 +55,7 @@ func XRequestID(next http.Handler) http.Handler {
 
 // EchoHandler is wrapper for Echo.
 func EchoHandler(next http.Handler) echo.HandlerFunc {
-	return func(ctx echo.Context) error {
+	return func(ctx *echo.Context) error {
 		ctx = applySentryHubToContext(ctx)
 		ctx = applyIPToContext(ctx)
 		req := ctx.Request()
@@ -67,7 +67,7 @@ func EchoHandler(next http.Handler) echo.HandlerFunc {
 // EchoSentryHubContext middleware applies sentry hub to context for zenrpc middleware.
 func EchoSentryHubContext() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return next(applySentryHubToContext(c))
 		}
 	}
@@ -76,13 +76,13 @@ func EchoSentryHubContext() echo.MiddlewareFunc {
 // EchoIPContext middleware applies client ip to context for zenrpc middleware.
 func EchoIPContext() echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
+		return func(c *echo.Context) error {
 			return next(applyIPToContext(c))
 		}
 	}
 }
 
-func applySentryHubToContext(c echo.Context) echo.Context {
+func applySentryHubToContext(c *echo.Context) *echo.Context {
 	if hub := sentryecho.GetHubFromContext(c); hub != nil {
 		req := c.Request()
 		c.SetRequest(req.WithContext(sentry.SetHubOnContext(req.Context(), hub)))
@@ -90,7 +90,7 @@ func applySentryHubToContext(c echo.Context) echo.Context {
 	return c
 }
 
-func applyIPToContext(c echo.Context) echo.Context {
+func applyIPToContext(c *echo.Context) *echo.Context {
 	req := c.Request()
 	c.SetRequest(req.WithContext(NewIPContext(req.Context(), c.RealIP())))
 	return c

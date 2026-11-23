@@ -2,12 +2,16 @@
 package main
 
 import (
+	"context"
 	"log/slog"
 	_ "net/http/pprof"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/vmkteam/appkit"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -35,8 +39,11 @@ func main() {
 	httpHeaders := appkit.NewInternalHeaders(appName, version)
 	_ = httpHeaders
 
-	// start echo
-	if err := e.Start(":8080"); err != nil {
+	// start echo, shut it down gracefully on SIGINT or SIGTERM
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	if err := appkit.StartEcho(ctx, e, ":8080"); err != nil {
 		slog.Error("http server exited", "err", err.Error())
 	}
 }

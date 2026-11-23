@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -58,7 +58,7 @@ func NewMetadataManager(opts MetadataOpts) *MetadataManager {
 }
 
 // Handler returns the metadata configuration as JSON.
-func (d *MetadataManager) Handler(c echo.Context) error {
+func (d *MetadataManager) Handler(c *echo.Context) error {
 	return c.JSON(http.StatusOK, d.opts)
 }
 
