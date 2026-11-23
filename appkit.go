@@ -8,6 +8,14 @@ import (
 
 type contextKey string
 
+// Prometheus namespace and subsystems of all appkit metrics.
+const (
+	metricsNamespace           = "app"
+	metricsSubsystemHTTP       = "http"
+	metricsSubsystemHTTPClient = "http_client"
+	metricsSubsystemMetadata   = "metadata"
+)
+
 // Version returns app version from VCS info.
 func Version() string {
 	result := "devel"

@@ -189,7 +189,7 @@ arithsrvClient := arithsrv.NewClient(arithsrvUrl, appkit.NewHTTPClient("arithsrv
 
 ## Migrating from v0.1.x
 
-Since v0.2.0 AppKit uses Echo v5 instead of Echo v4 and requires Go 1.26 or newer.
+Since v0.2.0 AppKit uses Echo v5 instead of Echo v4 and requires Go 1.27 or newer.
 Services have to migrate their own Echo code as well, see [Echo v5 API changes](https://github.com/labstack/echo/blob/master/API_CHANGES_V5.md).
 What changes in AppKit itself:
 

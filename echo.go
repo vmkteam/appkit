@@ -63,9 +63,9 @@ func RenderRoutes(appName string, e *echo.Echo) echo.HandlerFunc {
 
 		// render template
 		var sb strings.Builder
-		sb.WriteString(fmt.Sprintf("<html><body><h1>%s</h1><ul>", appName))
+		fmt.Fprintf(&sb, "<html><body><h1>%s</h1><ul>", appName)
 		for _, path := range paths {
-			sb.WriteString(fmt.Sprintf(`<li><a href="%s">%s</a></li>`, path, path))
+			fmt.Fprintf(&sb, `<li><a href="%s">%s</a></li>`, path, path)
 		}
 		sb.WriteString("</ul></body></html>")
 
@@ -96,15 +96,15 @@ func HTTPMetrics(serverName string) echo.MiddlewareFunc {
 	labels := []string{"method", "uri", "code", "server"}
 
 	echoRequests := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "app",
-		Subsystem: "http",
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystemHTTP,
 		Name:      "requests_total",
 		Help:      "Requests count by method/path/status.",
 	}, labels)
 
 	echoDurations := prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Namespace: "app",
-		Subsystem: "http",
+		Namespace: metricsNamespace,
+		Subsystem: metricsSubsystemHTTP,
 		Name:      "responses_duration_seconds",
 		Help:      "Response time by method/path/status.",
 	}, labels)

@@ -1,6 +1,6 @@
 module github.com/vmkteam/appkit
 
-go 1.26.0
+go 1.27.4
 
 require (
 	github.com/getsentry/sentry-go v0.50.0

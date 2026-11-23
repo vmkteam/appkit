@@ -150,7 +150,7 @@ func TestEchoHandler(t *testing.T) {
 	var gotIP, gotRequestID string
 	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		gotIP = appkit.IPFromContext(r.Context())
-		gotRequestID = r.Header.Get("X-Request-Id")
+		gotRequestID = r.Header.Get("X-Request-ID")
 		w.WriteHeader(http.StatusOK)
 	})
 
@@ -165,8 +165,8 @@ func TestEchoHandler(t *testing.T) {
 	if gotIP != "192.0.2.1" {
 		t.Errorf("IP in request context = %q, want remote address", gotIP)
 	}
-	if gotRequestID == "" || rec.Header().Get("X-Request-Id") != gotRequestID {
-		t.Errorf("X-Request-ID: request = %q, response = %q, want the same generated value", gotRequestID, rec.Header().Get("X-Request-Id"))
+	if gotRequestID == "" || rec.Header().Get("X-Request-ID") != gotRequestID {
+		t.Errorf("X-Request-ID: request = %q, response = %q, want the same generated value", gotRequestID, rec.Header().Get("X-Request-ID"))
 	}
 	if origin := rec.Header().Get("Access-Control-Allow-Origin"); origin != "*" {
 		t.Errorf("Access-Control-Allow-Origin = %q, want *", origin)
