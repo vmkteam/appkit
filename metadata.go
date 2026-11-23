@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -58,7 +58,7 @@ func NewMetadataManager(opts MetadataOpts) *MetadataManager {
 }
 
 // Handler returns the metadata configuration as JSON.
-func (d *MetadataManager) Handler(c echo.Context) error {
+func (d *MetadataManager) Handler(c *echo.Context) error {
 	return c.JSON(http.StatusOK, d.opts)
 }
 
@@ -66,8 +66,8 @@ func (d *MetadataManager) Handler(c echo.Context) error {
 func (d *MetadataManager) RegisterMetrics() {
 	appInfo := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: "app",
-			Subsystem: "metadata",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemMetadata,
 			Name:      "service",
 			Help:      "Metadata information about the application service",
 		}, []string{"public_api", "private_api", "cron", "brokersrv_queue"},
@@ -75,8 +75,8 @@ func (d *MetadataManager) RegisterMetrics() {
 
 	appDBs := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "app",
-			Subsystem: "metadata",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemMetadata,
 			Name:      "db_connections_total",
 			Help:      "Number of database connections used by App",
 		}, []string{"dbname", "replica"},
@@ -84,8 +84,8 @@ func (d *MetadataManager) RegisterMetrics() {
 
 	appServices := prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: "app",
-			Subsystem: "metadata",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemMetadata,
 			Name:      "services",
 			Help:      "Services used by App",
 		}, []string{"service", "type"},

@@ -14,34 +14,42 @@ const (
 	ctxCallerName contextKey = "callerName"
 )
 
+// Labels of HTTP client metrics.
+const (
+	labelCode   = "code"
+	labelMethod = "method"
+	labelCaller = "caller"
+	labelOrigin = "origin"
+)
+
 var (
 	clientMetricsOnce sync.Once
 	clientRequests    = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Namespace: "app",
-			Subsystem: "http_client",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemHTTPClient,
 			Name:      "requests_total",
 			Help:      "Requests count by code/method/client/origin.",
 		},
-		[]string{"code", "method", "caller", "origin"},
+		[]string{labelCode, labelMethod, labelCaller, labelOrigin},
 	)
 	clientDurations = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Namespace: "app",
-			Subsystem: "http_client",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemHTTPClient,
 			Name:      "responses_duration_seconds",
 			Help:      "Response time by code/method/client/origin.",
 		},
-		[]string{"code", "method", "caller", "origin"},
+		[]string{labelCode, labelMethod, labelCaller, labelOrigin},
 	)
 	clientInflights = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Namespace: "app",
-			Subsystem: "http_client",
+			Namespace: metricsNamespace,
+			Subsystem: metricsSubsystemHTTPClient,
 			Name:      "requests_inflight",
 			Help:      "Gauge for inflight requests.",
 		},
-		[]string{"caller", "origin"},
+		[]string{labelCaller, labelOrigin},
 	)
 )
 
@@ -66,8 +74,8 @@ func (m *metricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 		origin = req.URL.Scheme + "://" + req.URL.Host
 	}
 	labels := prometheus.Labels{
-		"caller": CallerNameFromContext(req.Context()),
-		"origin": origin,
+		labelCaller: CallerNameFromContext(req.Context()),
+		labelOrigin: origin,
 	}
 
 	start := time.Now()
@@ -80,8 +88,8 @@ func (m *metricsRoundTripper) RoundTrip(req *http.Request) (*http.Response, erro
 	if resp != nil {
 		code = strconv.Itoa(resp.StatusCode)
 	}
-	labels["code"] = code
-	labels["method"] = req.Method
+	labels[labelCode] = code
+	labels[labelMethod] = req.Method
 
 	clientRequests.With(labels).Inc()
 	clientDurations.With(labels).Observe(duration)

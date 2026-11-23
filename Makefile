@@ -1,4 +1,4 @@
-LINT_VERSION := v2.5.0
+LINT_VERSION := v2.15.0
 .PHONY: *
 
 tools:

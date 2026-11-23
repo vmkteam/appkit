@@ -6,12 +6,12 @@ import (
 	"encoding/hex"
 	"regexp"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 const (
 	ctxXRequestIDKey string = echo.HeaderXRequestID
-	headerXRequestID string = echo.HeaderXRequestID
+	headerXRequestID string = "X-Request-ID"
 )
 
 var xRequestIDre = regexp.MustCompile(`[a-zA-Z0-9-]+`)

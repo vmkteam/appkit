@@ -13,7 +13,7 @@ A comprehensive Go utility package providing common application framework compon
 - **HTTP Headers**: Pre-configured internal service headers with app name and version
 
 ### Echo Framework Integration
-- **Pre-configured Echo Server**: Ready-to-use Echo instance with security and monitoring middleware
+- **Pre-configured Echo Server**: Ready-to-use [Echo v5](https://github.com/labstack/echo) instance with security and monitoring middleware
 - **IP Extraction**: Proper IP handling with real IP header support and CIDR trust ranges
 - **Sentry Integration**: Built-in error tracking with Sentry middleware
 - **Route Rendering**: Automatic HTML route listing for service discovery
@@ -60,6 +60,14 @@ e.GET("/", appkit.RenderRoutes("API Service", e))
 
 // pprof endpoints
 e.GET("/debug/pprof/*", appkit.PprofHandler)
+
+// Start the server, it is shut down gracefully when ctx is done
+ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+defer stop()
+
+if err := appkit.StartEcho(ctx, e, ":8080"); err != nil {
+    slog.Error("http server exited", "err", err)
+}
 ```
 
 ### Service Metadata Configuration
@@ -127,8 +135,9 @@ arithsrvClient := arithsrv.NewClient(arithsrvUrl, appkit.NewHTTPClient("arithsrv
 ### Echo Framework
 
 - `NewEcho() *echo.Echo` - Creates pre-configured Echo instance
+- `StartEcho(ctx context.Context, e *echo.Echo, address string) error` - Starts HTTP server without banner and port messages, shuts it down gracefully when ctx is done
 - `RenderRoutes(appName string, e *echo.Echo) echo.HandlerFunc` - HTML route renderer
-- `PprofHandler(c echo.Context) error` - pprof endpoint handler
+- `PprofHandler(c *echo.Context) error` - pprof endpoint handler
 - `EchoHandlerFunc(next http.HandlerFunc) echo.HandlerFunc` - HTTP handler wrapper
 
 ### Metrics & Monitoring
@@ -178,9 +187,18 @@ arithsrvClient := arithsrv.NewClient(arithsrvUrl, appkit.NewHTTPClient("arithsrv
 - `NewMethodContext(ctx context.Context, method string) context.Context` - Creates context with method
 - `MethodFromContext(ctx context.Context) string` - Retrieves method from context
 
+## Migrating from v0.1.x
+
+Since v0.2.0 AppKit uses Echo v5 instead of Echo v4 and requires Go 1.27 or newer.
+Services have to migrate their own Echo code as well, see [Echo v5 API changes](https://github.com/labstack/echo/blob/master/API_CHANGES_V5.md).
+What changes in AppKit itself:
+
+- All handlers and middlewares use `*echo.Context` instead of `echo.Context`.
+- `HideBanner` and `HidePort` moved from `echo.Echo` to `echo.StartConfig`, so `NewEcho` can not hide them anymore. Start the server with `StartEcho` instead of `e.Start` to keep the output clean.
+
 ## Dependencies
 
-- [Echo](https://echo.labstack.com/) - High performance HTTP framework
+- [Echo](https://echo.labstack.com/) v5 - High performance HTTP framework
 - [Prometheus](https://prometheus.io/) - Metrics collection and monitoring
 - [Sentry](https://sentry.io/) - Error tracking and monitoring
 
